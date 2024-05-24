@@ -18,8 +18,11 @@ module "lbr-vpc" {
 
 
 module "ubuntu-tailscale-client" {
-  source   = "../../"
-  auth_key = var.tailscale_auth_key
+  source         = "../../"
+  auth_key       = var.tailscale_auth_key
+  enable_ssh     = true
+  hostname       = "example-client"
+  advertise_tags = ["tag:client"]
 }
 
 data "aws_ami" "ubuntu" {
@@ -39,20 +42,15 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_security_group" "main" {
-  vpc_id = module.lbr-vpc.vpc_id
+  vpc_id      = module.lbr-vpc.vpc_id
+  description = "Tailscale required traffic"
 
   ingress {
     from_port   = 41641
     to_port     = 41641
     protocol    = "udp"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "Tailscale UDP port"
   }
 
   egress {
@@ -60,21 +58,29 @@ resource "aws_security_group" "main" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound traffic"
   }
 }
 
-resource "aws_key_pair" "main" {
-  key_name   = "user-data-tailscale-ubuntu"
-  public_key = file("~/.ssh/id_rsa.pub")
-}
+# resource "aws_key_pair" "main" {
+#   key_name   = "user-data-tailscale-ubuntu"
+#   public_key = file("~/.ssh/id_rsa.pub")
+# }
 
 resource "aws_instance" "web" {
+  #checkov:skip=CKV2_AWS_41:Testing instance
+  #checkov:skip=CKV_AWS_8:Testing instance
+  #checkov:skip=CKV_AWS_126:Testing instance
+  #checkov:skip=CKV_AWS_88:Testing instance
   ami             = data.aws_ami.ubuntu.id
   instance_type   = "t3.micro"
   subnet_id       = module.lbr-vpc.public_subnets[0]
   security_groups = [aws_security_group.main.id]
 
-  key_name = aws_key_pair.main.key_name
+  #key_name = aws_key_pair.main.key_name
+
+
+  ebs_optimized = true
 
   user_data_base64            = module.ubuntu-tailscale-client.rendered
   associate_public_ip_address = true

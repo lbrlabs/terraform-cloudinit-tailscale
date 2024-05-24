@@ -145,13 +145,13 @@ variable "stateful_filtering" {
 }
 
 variable "max_retries" {
-    description = "maximum number of retries to connect to the control server"
-    type        = number
-    default     = 3
+  description = "maximum number of retries to connect to the control server"
+  type        = number
+  default     = 3
 }
 
 variable "retry_delay" {
-    description = "delay in seconds between retries to connect to the control server"
-    type        = number
-    default     = 5
+  description = "delay in seconds between retries to connect to the control server"
+  type        = number
+  default     = 5
 }
