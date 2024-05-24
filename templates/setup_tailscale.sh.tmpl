@@ -1,0 +1,59 @@
+#!/bin/sh
+
+# Verify we have internet connectivity
+max_retries=${MAX_RETRIES}
+retry_delay=${RETRY_DELAY}
+i=1
+
+while [ $i -le $max_retries ]
+do
+  sudo systemctl enable --now tailscaled
+  
+  # Construct the tailscale up command based on the presence of advertise_tags variable
+  tailscale_cmd="tailscale up --advertise-exit-node=\"${ADVERTISE_EXIT_NODE}\" \
+    --advertise-connector=\"${ADVERTISE_CONNECTOR}\" \
+    --accept-dns=\"${ACCEPT_DNS}\" \
+    --accept-routes=\"${ACCEPT_ROUTES}\" \
+    --authkey \"${TAILSCALE_AUTH_KEY}\" \
+    --advertise-routes=\"${ADVERTISE_ROUTES}\" \
+    --snat-subnet-routes=false \
+    --hostname=\"${HOSTNAME}\" \
+    --exit-node=\"${EXIT_NODE}\" \
+    --exit-node-allow-lan-access=\"${EXIT_NODE_ALLOW_LAN_ACCESS}\" \
+    --json=\"${JSON}\" \
+    --login-server=\"${LOGIN_SERVER}\" \
+    --reset=\"${RESET}\" \
+    --shields-up=\"${SHIELDS_UP}\" \
+    --ssh=\"${TAILSCALE_SSH}\" \
+    --snat-subnet-routes=\"${SNAT_SUBNET_ROUTES}\" \
+    --netfilter-mode=\"${NETFILTER_MODE}\" \
+    --stateful-filtering\"${NETFILTER_MODE}\" \
+    --timeout=\"${TIMEOUT}\" \
+    --force-reauth=\"${FORCE_REAUTH}\""
+  
+  if [ -n "${ADVERTISE_TAGS}" ]; then
+    tailscale_cmd="$tailscale_cmd --advertise-tags=\"${ADVERTISE_TAGS}\""
+  fi
+  
+  if [ -n "${HOSTNAME}" ]; then
+    tailscale_cmd="$tailscale_cmd --hostname=\"${HOSTNAME}\""
+  fi
+  
+  if [ -n "${OPERATOR}" ]; then
+    tailscale_cmd="$tailscale_cmd --operator=\"${OPERATOR}\""
+  fi
+  
+  # Execute the tailscale up command
+  eval "$tailscale_cmd"
+  
+  # Check the exit status of the previous command
+  if [ $? -eq 0 ]; then
+    echo "Tailscale installation and configuration succeeded"
+    exit 0
+  else
+    echo "Tailscale installation and configuration failed. Retry attempt $i"
+    sleep $retry_delay
+  fi
+  
+  i=$((i + 1))
+done

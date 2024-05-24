@@ -1,0 +1,31 @@
+repos:
+  - repo: https://github.com/gruntwork-io/pre-commit
+    # When updating, also check if tflint version in pre-commit workflow can be updated.
+    rev: "v0.1.23" # Get the latest from: https://github.com/gruntwork-io/pre-commit/releases
+    hooks:
+      - id: terraform-validate # It should be the first step as it runs terraform init required by tflint
+      - id: terraform-fmt
+      - id: tflint
+
+  - repo: https://github.com/terraform-docs/terraform-docs
+    rev: "v0.16.0" # Get the latest from: https://github.com/terraform-docs/terraform-docs/releases
+    hooks:
+      - id: terraform-docs-system
+        args: ["."]
+
+  - repo: https://github.com/bridgecrewio/checkov.git
+    rev: "2.5.13" # Get the latest from: https://github.com/bridgecrewio/checkov/releases
+    hooks:
+      - id: checkov
+        args: [--skip-check, "CKV_TF_1"] # Terraform module sources do not use a git url with a commit hash revision
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: "v4.5.0" # Get the latest from: https://github.com/pre-commit/pre-commit-hooks/releases
+    hooks:
+      - id: check-merge-conflict
+        args: ["--assume-in-merge"]
+      - id: mixed-line-ending
+        args: ["--fix=auto"]
+      - id: end-of-file-fixer
+      - id: check-case-conflict
+      - id: check-yaml
