@@ -155,3 +155,14 @@ variable "retry_delay" {
   type        = number
   default     = 5
 }
+
+variable "additional_parts" {
+  description = "Additional user defined part blocks for the cloudinit_config data source"
+  type = list(object({
+    filename     = string
+    content_type = optional(string)
+    content      = optional(string)
+    merge_type   = optional(string)
+  }))
+  default = []
+}

@@ -3,6 +3,13 @@ data "cloudinit_config" "main" {
   base64_encode = var.base64_encode
 
   part {
+    filename     = "ip_forwardiing.sh"
+    content_type = "text/x-shellscript"
+
+    content = file("${path.module}/files/ip_forwarding.sh")
+  }
+
+  part {
     filename     = "install_tailscale.sh"
     content_type = "text/x-shellscript"
 
@@ -43,6 +50,15 @@ curl -fsSL https://tailscale.com/install.sh | sh
       MAX_RETRIES                = var.max_retries
       RETRY_DELAY                = var.retry_delay
     })
+  }
+
+  dynamic "part" {
+    for_each = var.additional_parts
+    content {
+      filename     = part.value.filename
+      content_type = part.value.content_type
+      content      = part.value.content
+    }
   }
 
 
