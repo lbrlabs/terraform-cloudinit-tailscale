@@ -3,7 +3,7 @@ data "cloudinit_config" "main" {
   base64_encode = var.base64_encode
 
   part {
-    filename     = "ip_forwardiing.sh"
+    filename     = "ip_forwarding.sh"
     content_type = "text/x-shellscript"
 
     content = file("${path.module}/files/ip_forwarding.sh")
