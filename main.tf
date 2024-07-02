@@ -32,10 +32,9 @@ curl -fsSL https://tailscale.com/install.sh | sh
       ADVERTISE_EXIT_NODE        = var.advertise_exit_node
       HOSTNAME                   = var.hostname
       TAILSCALE_SSH              = var.enable_ssh
-      AUTH_KEY                   = var.auth_key
+      AUTH_KEY                   = sensitive(var.auth_key)
       EXIT_NODE                  = var.exit_node
       EXIT_NODE_ALLOW_LAN_ACCESS = var.exit_node_allow_lan_access
-      TAILSCALE_AUTH_KEY         = var.auth_key
       FORCE_REAUTH               = var.force_reauth
       JSON                       = var.json
       LOGIN_SERVER               = var.login_server
