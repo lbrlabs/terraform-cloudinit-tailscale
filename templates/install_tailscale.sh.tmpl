@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Verify we have internet connectivity
+max_retries=${MAX_RETRIES}
+retry_delay=${RETRY_DELAY}
+i=1
+
+
+# Function to log messages
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+}
+
+# Export the TRACK variable
+TRACK="${TRACK}"
+export TRACK
+
+log "Starting Tailscale installation with TRACK=$TRACK"
+
+while [ $i -le $max_retries ]
+do
+    # Download and run the Tailscale install script
+    if curl -fsSL https://tailscale.com/install.sh | sh; then
+        log "Tailscale installation script executed successfully"
+    else
+        log "Error: Tailscale installation script failed. Retry attempt $i"
+        sleep $retry_delay
+        i=$((i + 1))
+        continue
+    fi
+
+    # Check if Tailscale is installed correctly
+    if command -v tailscale >/dev/null 2>&1; then
+        log "Tailscale installed successfully"
+        tailscale version
+        exit 0
+    else
+        log "Error: Tailscale installation could not be verified. Retry attempt $i"
+        sleep $retry_delay
+        i=$((i + 1))
+    fi
+done
+
+log "Tailscale installation completed"
+exit 0

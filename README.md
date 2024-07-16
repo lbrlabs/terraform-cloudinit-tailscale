@@ -33,6 +33,7 @@
 | <a name="input_snat_subnet_routes"></a> [snat\_subnet\_routes](#input\_snat\_subnet\_routes) | source NAT traffic to local routes advertised with --advertise-routes | `bool` | `true` | no |
 | <a name="input_stateful_filtering"></a> [stateful\_filtering](#input\_stateful\_filtering) | apply stateful filtering to forwarded packets | `bool` | `false` | no |
 | <a name="input_timeout"></a> [timeout](#input\_timeout) | maximum amount of time to wait for tailscaled to enter a Running state | `string` | `"0s"` | no |
+| <a name="input_track"></a> [track](#input\_track) | Version of the Tailscale client to install | `string` | `"stable"` | no |
 
 ## Modules
 
