@@ -166,3 +166,13 @@ variable "additional_parts" {
   }))
   default = []
 }
+
+variable "track" {
+  description = "Version of the Tailscale client to install"
+  type        = string
+  default     = "stable"
+  validation {
+    condition     = contains(["stable", "unstable"], var.track)
+    error_message = "Allowed values for track are \"stable\", \"unstable\""
+  }
+}

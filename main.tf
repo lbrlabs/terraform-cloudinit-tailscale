@@ -5,24 +5,22 @@ data "cloudinit_config" "main" {
   part {
     filename     = "ip_forwarding.sh"
     content_type = "text/x-shellscript"
-
-    content = file("${path.module}/files/ip_forwarding.sh")
+    content      = file("${path.module}/files/ip_forwarding.sh")
   }
 
   part {
     filename     = "install_tailscale.sh"
     content_type = "text/x-shellscript"
-
-    content = <<-EOF
-#!/bin/sh
-curl -fsSL https://tailscale.com/install.sh | sh
-    EOF
+    content = templatefile("${path.module}/templates/install_tailscale.sh.tmpl", {
+      TRACK       = var.track
+      MAX_RETRIES = var.max_retries
+      RETRY_DELAY = var.retry_delay
+    })
   }
 
   part {
-    filename     = "tailscale.sh"
+    filename     = "setup_tailscale.sh"
     content_type = "text/x-shellscript"
-
     content = templatefile("${path.module}/templates/setup_tailscale.sh.tmpl", {
       ADVERTISE_ROUTES           = join(",", var.advertise_routes)
       ADVERTISE_TAGS             = join(",", var.advertise_tags)
@@ -40,7 +38,6 @@ curl -fsSL https://tailscale.com/install.sh | sh
       LOGIN_SERVER               = var.login_server
       OPERATOR                   = var.operator
       RESET                      = var.reset
-      TAILSCALE_SSH              = var.enable_ssh
       SHIELDS_UP                 = var.shields_up
       TIMEOUT                    = var.timeout
       SNAT_SUBNET_ROUTES         = var.snat_subnet_routes
@@ -59,6 +56,4 @@ curl -fsSL https://tailscale.com/install.sh | sh
       content      = part.value.content
     }
   }
-
-
 }
