@@ -9,6 +9,12 @@ data "cloudinit_config" "main" {
   }
 
   part {
+    filename     = "udp_offloads.sh"
+    content_type = "text/x-shellscript"
+    content      = file("${path.module}/files/udp_offloads.sh")
+  }
+
+  part {
     filename     = "install_tailscale.sh"
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/templates/install_tailscale.sh.tmpl", {
