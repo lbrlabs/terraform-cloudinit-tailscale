@@ -1,0 +1,96 @@
+#!/bin/sh
+
+# Configure tailscaled daemon preferences using systemd drop-in
+echo "Configuring tailscaled daemon preferences..."
+
+# Create systemd drop-in directory
+sudo mkdir -p /etc/systemd/system/tailscaled.service.d
+
+# Build FLAGS string from provided configuration
+FLAGS=""
+
+%{ if TAILSCALED_FLAG_BIRD_SOCKET != "" ~}
+FLAGS="$FLAGS --bird-socket=\"${TAILSCALED_FLAG_BIRD_SOCKET}\""
+%{ endif ~}
+
+%{ if TAILSCALED_FLAG_CONFIG != "" ~}
+FLAGS="$FLAGS --config=\"${TAILSCALED_FLAG_CONFIG}\""
+%{ endif ~}
+
+%{ if TAILSCALED_FLAG_DEBUG != "" ~}
+FLAGS="$FLAGS --debug=\"${TAILSCALED_FLAG_DEBUG}\""
+%{ endif ~}
+
+%{ if TAILSCALED_FLAG_ENCRYPT_STATE != false ~}
+FLAGS="$FLAGS --encrypt-state"
+%{ endif ~}
+
+%{ if TAILSCALED_FLAG_NO_LOGS_NO_SUPPORT != false ~}
+FLAGS="$FLAGS --no-logs-no-support"
+%{ endif ~}
+
+%{ if TAILSCALED_FLAG_OUTBOUND_HTTP_PROXY_LISTEN != "" ~}
+FLAGS="$FLAGS --outbound-http-proxy-listen=\"${TAILSCALED_FLAG_OUTBOUND_HTTP_PROXY_LISTEN}\""
+%{ endif ~}
+
+%{ if TAILSCALED_FLAG_PORT != 0 ~}
+FLAGS="$FLAGS --port=${TAILSCALED_FLAG_PORT}"
+%{ endif ~}
+
+%{ if TAILSCALED_FLAG_SOCKS5_SERVER != "" ~}
+FLAGS="$FLAGS --socks5-server=\"${TAILSCALED_FLAG_SOCKS5_SERVER}\""
+%{ endif ~}
+
+%{ if TAILSCALED_FLAG_TUN != "" ~}
+FLAGS="$FLAGS --tun=\"${TAILSCALED_FLAG_TUN}\""
+%{ endif ~}
+
+%{ if TAILSCALED_FLAG_VERBOSE != 0 ~}
+FLAGS="$FLAGS --verbose=${TAILSCALED_FLAG_VERBOSE}"
+%{ endif ~}
+
+# Determine state and socket flags - use custom values if provided, otherwise use defaults
+STATE_FLAG="--state=/var/lib/tailscale/tailscaled.state"
+SOCKET_FLAG="--socket=/run/tailscale/tailscaled.sock"
+
+%{ if TAILSCALED_FLAG_STATE != "" ~}
+STATE_FLAG="--state=\"${TAILSCALED_FLAG_STATE}\""
+%{ endif ~}
+
+%{ if TAILSCALED_FLAG_SOCKET != "" ~}
+SOCKET_FLAG="--socket=\"${TAILSCALED_FLAG_SOCKET}\""
+%{ endif ~}
+
+# Handle statedir separately as it affects the StateDirectory systemd setting
+%{ if TAILSCALED_FLAG_STATEDIR != "" ~}
+STATEDIR_OVERRIDE="StateDirectory=${TAILSCALED_FLAG_STATEDIR}"
+%{ else ~}
+STATEDIR_OVERRIDE=""
+%{ endif ~}
+
+# Create systemd drop-in configuration
+%{ if TAILSCALED_FLAG_STATEDIR != "" ~}
+cat << EOF | sudo tee /etc/systemd/system/tailscaled.service.d/lbrlabs-tf-module.conf
+[Service]
+ExecStart=
+ExecStart=/usr/sbin/tailscaled $STATE_FLAG $SOCKET_FLAG $FLAGS
+$STATEDIR_OVERRIDE
+EOF
+%{ else ~}
+cat << EOF | sudo tee /etc/systemd/system/tailscaled.service.d/lbrlabs-tf-module.conf
+[Service]
+ExecStart=
+ExecStart=/usr/sbin/tailscaled $STATE_FLAG $SOCKET_FLAG $FLAGS
+EOF
+%{ endif ~}
+
+# Reload systemd and restart tailscaled if it was already running
+sudo systemctl daemon-reload
+
+# Check if tailscaled is running before attempting restart
+if sudo systemctl is-active --quiet tailscaled; then
+  echo "Restarting tailscaled with new configuration..."
+  sudo systemctl restart tailscaled
+else
+  echo "tailscaled configuration updated, will be applied on next start"
+fi

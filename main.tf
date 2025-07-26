@@ -25,6 +25,26 @@ data "cloudinit_config" "main" {
   }
 
   part {
+    filename     = "configure_tailscaled.sh"
+    content_type = "text/x-shellscript"
+    content = templatefile("${path.module}/templates/configure_tailscaled.sh.tmpl", {
+      TAILSCALED_FLAG_BIRD_SOCKET                = var.tailscaled_flag_bird_socket
+      TAILSCALED_FLAG_CONFIG                     = var.tailscaled_flag_config
+      TAILSCALED_FLAG_DEBUG                      = var.tailscaled_flag_debug
+      TAILSCALED_FLAG_ENCRYPT_STATE              = var.tailscaled_flag_encrypt_state
+      TAILSCALED_FLAG_NO_LOGS_NO_SUPPORT         = var.tailscaled_flag_no_logs_no_support
+      TAILSCALED_FLAG_OUTBOUND_HTTP_PROXY_LISTEN = var.tailscaled_flag_outbound_http_proxy_listen
+      TAILSCALED_FLAG_PORT                       = var.tailscaled_flag_port
+      TAILSCALED_FLAG_SOCKET                     = var.tailscaled_flag_socket
+      TAILSCALED_FLAG_SOCKS5_SERVER              = var.tailscaled_flag_socks5_server
+      TAILSCALED_FLAG_STATE                      = var.tailscaled_flag_state
+      TAILSCALED_FLAG_STATEDIR                   = var.tailscaled_flag_statedir
+      TAILSCALED_FLAG_TUN                        = var.tailscaled_flag_tun
+      TAILSCALED_FLAG_VERBOSE                    = var.tailscaled_flag_verbose
+    })
+  }
+
+  part {
     filename     = "setup_tailscale.sh"
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/templates/setup_tailscale.sh.tmpl", {
@@ -51,6 +71,7 @@ data "cloudinit_config" "main" {
       STATEFUL_FILTERING         = var.stateful_filtering
       MAX_RETRIES                = var.max_retries
       RETRY_DELAY                = var.retry_delay
+      RELAY_SERVER_PORT          = var.relay_server_port
     })
   }
 

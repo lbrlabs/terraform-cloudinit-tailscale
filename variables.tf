@@ -176,3 +176,87 @@ variable "track" {
     error_message = "Allowed values for track are \"stable\", \"unstable\""
   }
 }
+
+variable "relay_server_port" {
+  description = "Port for the Tailscale relay server"
+  type        = number
+  default     = 7878
+}
+
+variable "tailscaled_flag_bird_socket" {
+  description = "path of the bird unix socket"
+  type        = string
+  default     = ""
+}
+
+variable "tailscaled_flag_config" {
+  description = "path to config file, or 'vm:user-data' to use the VM's user-data (EC2)"
+  type        = string
+  default     = ""
+}
+
+variable "tailscaled_flag_debug" {
+  description = "listen address ([ip]:port) of optional debug server"
+  type        = string
+  default     = ""
+}
+
+variable "tailscaled_flag_encrypt_state" {
+  description = "encrypt the state file on disk; uses TPM on Linux and Windows"
+  type        = bool
+  default     = false
+}
+
+variable "tailscaled_flag_no_logs_no_support" {
+  description = "disable log uploads; this also disables any technical support"
+  type        = bool
+  default     = false
+}
+
+variable "tailscaled_flag_outbound_http_proxy_listen" {
+  description = "optional [ip]:port to run an outbound HTTP proxy (e.g. \"localhost:8080\")"
+  type        = string
+  default     = ""
+}
+
+variable "tailscaled_flag_port" {
+  description = "UDP port to listen on for WireGuard and peer-to-peer traffic; 0 means automatically select"
+  type        = number
+  default     = 41641
+}
+
+variable "tailscaled_flag_socket" {
+  description = "path of the service unix socket"
+  type        = string
+  default     = "/run/tailscale/tailscaled.sock"
+}
+
+variable "tailscaled_flag_socks5_server" {
+  description = "optional [ip]:port to run a SOCK5 server (e.g. \"localhost:1080\")"
+  type        = string
+  default     = ""
+}
+
+variable "tailscaled_flag_state" {
+  description = "absolute path of state file; use 'kube:<secret-name>' to use Kubernetes secrets or 'arn:aws:ssm:...' to store in AWS SSM; use 'mem:' to not store state and register as an ephemeral node"
+  type        = string
+  default     = ""
+}
+
+variable "tailscaled_flag_statedir" {
+  description = "path to directory for storage of config state, TLS certs, temporary incoming Taildrop files, etc."
+  type        = string
+  default     = "/var/lib/tailscale/tailscaled.state"
+}
+
+variable "tailscaled_flag_tun" {
+  description = "tunnel interface name; use \"userspace-networking\" (beta) to not use TUN"
+  type        = string
+  default     = ""
+}
+
+variable "tailscaled_flag_verbose" {
+  description = "log verbosity level; 0 is default, 1 or higher are increasingly verbose"
+  type        = number
+  default     = 0
+}

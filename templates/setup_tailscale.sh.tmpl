@@ -9,47 +9,60 @@ while [ $i -le $max_retries ]
 do
   sudo systemctl enable --now tailscaled
   
-  # Construct the tailscale up command based on the presence of advertise_tags variable
-  tailscale_cmd="tailscale up --advertise-exit-node=\"${ADVERTISE_EXIT_NODE}\" \
-    --advertise-connector=\"${ADVERTISE_CONNECTOR}\" \
-    --accept-dns=\"${ACCEPT_DNS}\" \
-    --accept-routes=\"${ACCEPT_ROUTES}\" \
-    --authkey \"${AUTH_KEY}\" \
-    --advertise-routes=\"${ADVERTISE_ROUTES}\" \
-    --exit-node=\"${EXIT_NODE}\" \
-    --exit-node-allow-lan-access=\"${EXIT_NODE_ALLOW_LAN_ACCESS}\" \
+  # Construct the tailscale up command with connection/auth flags
+  tailscale_cmd="tailscale up --authkey \"${AUTH_KEY}\" \
     --json=\"${JSON}\" \
     --login-server=\"${LOGIN_SERVER}\" \
     --reset=\"${RESET}\" \
-    --shields-up=\"${SHIELDS_UP}\" \
-    --ssh=\"${TAILSCALE_SSH}\" \
-    --snat-subnet-routes=\"${SNAT_SUBNET_ROUTES}\" \
-    --netfilter-mode=\"${NETFILTER_MODE}\" \
-    --stateful-filtering=\"${STATEFUL_FILTERING}\" \
     --timeout=\"${TIMEOUT}\" \
     --force-reauth=\"${FORCE_REAUTH}\""
-  
-  if [ -n "${ADVERTISE_TAGS}" ]; then
-    tailscale_cmd="$tailscale_cmd --advertise-tags=\"${ADVERTISE_TAGS}\""
-  fi
   
   if [ -n "${HOSTNAME}" ]; then
     tailscale_cmd="$tailscale_cmd --hostname=\"${HOSTNAME}\""
   fi
   
-  if [ -n "${OPERATOR}" ]; then
-    tailscale_cmd="$tailscale_cmd --operator=\"${OPERATOR}\""
-  fi
-  
   # Execute the tailscale up command
   eval "$tailscale_cmd"
   
-  # Check the exit status of the previous command
+  # Check the exit status of the tailscale up command
   if [ $? -eq 0 ]; then
+    echo "Tailscale up succeeded, now configuring settings..."
+    
+    # Configure settings using tailscale set
+    tailscale set --accept-dns="${ACCEPT_DNS}"
+    tailscale set --accept-routes="${ACCEPT_ROUTES}"
+    tailscale set --advertise-exit-node="${ADVERTISE_EXIT_NODE}"
+    tailscale set --advertise-connector="${ADVERTISE_CONNECTOR}"
+    tailscale set --shields-up="${SHIELDS_UP}"
+    tailscale set --ssh="${TAILSCALE_SSH}"
+    tailscale set --snat-subnet-routes="${SNAT_SUBNET_ROUTES}"
+    tailscale set --netfilter-mode="${NETFILTER_MODE}"
+    tailscale set --stateful-filtering="${STATEFUL_FILTERING}"
+    
+    if [ -n "${ADVERTISE_ROUTES}" ]; then
+      tailscale set --advertise-routes="${ADVERTISE_ROUTES}"
+    fi
+    
+    if [ -n "${EXIT_NODE}" ]; then
+      tailscale set --exit-node="${EXIT_NODE}"
+    fi
+    
+    if [ -n "${EXIT_NODE_ALLOW_LAN_ACCESS}" ] && [ "${EXIT_NODE_ALLOW_LAN_ACCESS}" = "true" ]; then
+      tailscale set --exit-node-allow-lan-access="${EXIT_NODE_ALLOW_LAN_ACCESS}"
+    fi
+    
+    if [ -n "${ADVERTISE_TAGS}" ]; then
+      tailscale set --advertise-tags="${ADVERTISE_TAGS}"
+    fi
+    
+    if [ -n "${OPERATOR}" ]; then
+      tailscale set --operator="${OPERATOR}"
+    fi
+    
     echo "Tailscale installation and configuration succeeded"
     exit 0
   else
-    echo "Tailscale installation and configuration failed. Retry attempt $i"
+    echo "Tailscale up failed. Retry attempt $i"
     sleep $retry_delay
   fi
   

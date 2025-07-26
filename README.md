@@ -27,11 +27,25 @@
 | <a name="input_max_retries"></a> [max\_retries](#input\_max\_retries) | maximum number of retries to connect to the control server | `number` | `3` | no |
 | <a name="input_netfilter_mode"></a> [netfilter\_mode](#input\_netfilter\_mode) | netfilter mode | `string` | `"on"` | no |
 | <a name="input_operator"></a> [operator](#input\_operator) | Unix username to allow to operate on tailscaled without sudo | `string` | `""` | no |
+| <a name="input_relay_server_port"></a> [relay\_server\_port](#input\_relay\_server\_port) | Port for the Tailscale relay server | `number` | `7878` | no |
 | <a name="input_reset"></a> [reset](#input\_reset) | reset unspecified settings to their default values | `bool` | `false` | no |
 | <a name="input_retry_delay"></a> [retry\_delay](#input\_retry\_delay) | delay in seconds between retries to connect to the control server | `number` | `5` | no |
 | <a name="input_shields_up"></a> [shields\_up](#input\_shields\_up) | don't allow incoming connections | `bool` | `false` | no |
 | <a name="input_snat_subnet_routes"></a> [snat\_subnet\_routes](#input\_snat\_subnet\_routes) | source NAT traffic to local routes advertised with --advertise-routes | `bool` | `true` | no |
 | <a name="input_stateful_filtering"></a> [stateful\_filtering](#input\_stateful\_filtering) | apply stateful filtering to forwarded packets | `bool` | `false` | no |
+| <a name="input_tailscaled_flag_bird_socket"></a> [tailscaled\_flag\_bird\_socket](#input\_tailscaled\_flag\_bird\_socket) | path of the bird unix socket | `string` | `""` | no |
+| <a name="input_tailscaled_flag_config"></a> [tailscaled\_flag\_config](#input\_tailscaled\_flag\_config) | path to config file, or 'vm:user-data' to use the VM's user-data (EC2) | `string` | `""` | no |
+| <a name="input_tailscaled_flag_debug"></a> [tailscaled\_flag\_debug](#input\_tailscaled\_flag\_debug) | listen address ([ip]:port) of optional debug server | `string` | `""` | no |
+| <a name="input_tailscaled_flag_encrypt_state"></a> [tailscaled\_flag\_encrypt\_state](#input\_tailscaled\_flag\_encrypt\_state) | encrypt the state file on disk; uses TPM on Linux and Windows | `bool` | `false` | no |
+| <a name="input_tailscaled_flag_no_logs_no_support"></a> [tailscaled\_flag\_no\_logs\_no\_support](#input\_tailscaled\_flag\_no\_logs\_no\_support) | disable log uploads; this also disables any technical support | `bool` | `false` | no |
+| <a name="input_tailscaled_flag_outbound_http_proxy_listen"></a> [tailscaled\_flag\_outbound\_http\_proxy\_listen](#input\_tailscaled\_flag\_outbound\_http\_proxy\_listen) | optional [ip]:port to run an outbound HTTP proxy (e.g. "localhost:8080") | `string` | `""` | no |
+| <a name="input_tailscaled_flag_port"></a> [tailscaled\_flag\_port](#input\_tailscaled\_flag\_port) | UDP port to listen on for WireGuard and peer-to-peer traffic; 0 means automatically select | `number` | `41641` | no |
+| <a name="input_tailscaled_flag_socket"></a> [tailscaled\_flag\_socket](#input\_tailscaled\_flag\_socket) | path of the service unix socket | `string` | `"/run/tailscale/tailscaled.sock"` | no |
+| <a name="input_tailscaled_flag_socks5_server"></a> [tailscaled\_flag\_socks5\_server](#input\_tailscaled\_flag\_socks5\_server) | optional [ip]:port to run a SOCK5 server (e.g. "localhost:1080") | `string` | `""` | no |
+| <a name="input_tailscaled_flag_state"></a> [tailscaled\_flag\_state](#input\_tailscaled\_flag\_state) | absolute path of state file; use 'kube:<secret-name>' to use Kubernetes secrets or 'arn:aws:ssm:...' to store in AWS SSM; use 'mem:' to not store state and register as an ephemeral node | `string` | `""` | no |
+| <a name="input_tailscaled_flag_statedir"></a> [tailscaled\_flag\_statedir](#input\_tailscaled\_flag\_statedir) | path to directory for storage of config state, TLS certs, temporary incoming Taildrop files, etc. | `string` | `"/var/lib/tailscale/tailscaled.state"` | no |
+| <a name="input_tailscaled_flag_tun"></a> [tailscaled\_flag\_tun](#input\_tailscaled\_flag\_tun) | tunnel interface name; use "userspace-networking" (beta) to not use TUN | `string` | `""` | no |
+| <a name="input_tailscaled_flag_verbose"></a> [tailscaled\_flag\_verbose](#input\_tailscaled\_flag\_verbose) | log verbosity level; 0 is default, 1 or higher are increasingly verbose | `number` | `0` | no |
 | <a name="input_timeout"></a> [timeout](#input\_timeout) | maximum amount of time to wait for tailscaled to enter a Running state | `string` | `"0s"` | no |
 | <a name="input_track"></a> [track](#input\_track) | Version of the Tailscale client to install | `string` | `"stable"` | no |
 
